@@ -6,12 +6,12 @@ import Context from '@/presentation/contexts/form/form-context'
 type Props = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
 
 const FormStatus: React.FC<Props> = (props: Props) => {
-  const { state, errorState } = useContext(Context)
-
+  const { state } = useContext(Context)
+  const { isLoading, mainError } = state
   return (
     <div data-testid='error-wrap' className={Styles.errorWrap}>
-      { state.isLoading && <Spinner className={Styles.spinner} /> }
-      {errorState.main && <span className={Styles.error}>{errorState.main}</span> }
+      { isLoading && <Spinner className={Styles.spinner} /> }
+      { mainError && <span className={Styles.error}>{mainError}</span> }
     </div>
   )
 }
