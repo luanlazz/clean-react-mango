@@ -11,7 +11,7 @@ describe('EmailValidation', () => {
     const field = faker.random.word()
     const sut = makeSut(field)
     const error = sut.validate(faker.random.word())
-    expect(error).toEqual(new InvalidFieldError(field))
+    expect(error).toEqual(new InvalidFieldError())
   })
 
   test('Should return falsy if email is valid', () => {
