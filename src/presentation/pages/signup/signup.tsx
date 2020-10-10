@@ -4,6 +4,7 @@ import { LoginHeader, Footer, Input, FormStatus } from '@/presentation/component
 import Context from '@/presentation/contexts/form/form-context'
 import { Validation } from '@/presentation/protocols/validation'
 import { AddAccount } from '@/domain/usecases'
+import { stat } from 'fs'
 
 type Props = {
   validation: Validation
@@ -37,6 +38,9 @@ const SignUp: React.FC<Props> = ({ validation, addAccount }: Props) => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
     setState(old => ({ ...old, isLoading: true }))
+
+    if (state.isLoading) return
+
     await addAccount.add({
       name: state.name,
       email: state.email,
