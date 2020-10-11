@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import Styles from './login-styles.scss'
-import { LoginHeader, Footer, Input, FormStatus } from '@/presentation/components'
+import { LoginHeader, Footer, Input, FormStatus, SubmitButton } from '@/presentation/components'
 import { Validation } from '@/presentation/protocols/validation'
 import { Authentication, SaveAccessToken } from '@/domain/usecases'
 import Context from '@/presentation/contexts/form/form-context'
@@ -16,6 +16,7 @@ const Login: React.FC<Props> = ({ validation, authentication, saveAccessToken }:
   const history = useHistory()
   const [state, setState] = useState({
     isLoading: false,
+    isFormInvalid: true,
     email: '',
     password: '',
     emailError: '',
@@ -24,28 +25,31 @@ const Login: React.FC<Props> = ({ validation, authentication, saveAccessToken }:
   })
 
   useEffect(() => {
-    setState({
-      ...state,
-      emailError: validation.validate('email', state.email),
-      passwordError: validation.validate('password', state.password)
-    })
+    const emailError = validation.validate('email', state.email)
+    const passwordError = validation.validate('password', state.password)
+
+    setState(old => ({
+      ...old,
+      emailError,
+      passwordError,
+      isFormInvalid: !!emailError || !!passwordError
+    }))
   }, [state.email, state.password])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
     try {
-      if (state.isLoading || state.emailError || state.passwordError) {
-        return
-      }
-      setState({
-        ...state,
+      if (state.isLoading || state.isFormInvalid) return
+
+      setState(old => ({
+        ...old,
         isLoading: true
-      })
+      }))
+
       const account = await authentication.auth({
         email: state.email,
         password: state.password
       })
-
       await saveAccessToken.save(account.accessToken)
       history.replace('/')
     } catch (error) {
@@ -68,14 +72,7 @@ const Login: React.FC<Props> = ({ validation, authentication, saveAccessToken }:
           <Input type='email' name='email' placeholder='Digite seu e-mail' />
           <Input type='password' name='password' placeholder='Digite sua senha' />
 
-          <button
-            data-testid='submit'
-            className={Styles.submit}
-            type='submit'
-            disabled={!!state.emailError || !!state.passwordError}
-          >
-            Entrar
-          </button>
+          <SubmitButton text={'Entrar'} />
 
           <Link
             data-testid='signup-link'
