@@ -1,11 +1,12 @@
 import React from 'react'
 import { makeLoginValidation } from './login-validation-factory'
 import { makeRemoteAuthentication, makeLocalSaveAccessToken } from '@/main/factories/usecases'
-import { Login } from '@/presentation/pages'
+
+const LoginView = React.lazy(async () => import('@/presentation/pages/login/login'))
 
 export const makeLogin: React.FC = () => {
   return (
-    <Login
+    <LoginView
       authentication={makeRemoteAuthentication()}
       validation={makeLoginValidation()}
       saveAccessToken={makeLocalSaveAccessToken()}
